@@ -1,0 +1,33 @@
+cabal-version:   3.0
+name:            tracker 
+version:         0.1.0.0
+license:         NONE
+author:          Joe
+maintainer:      joe@example.com
+build-type:      Simple
+
+common settings
+    ghc-options: -Wall
+    default-language: GHC2021
+
+library 
+  import: settings
+  build-depends: 
+    , base
+    , text
+    , time
+    , filepath
+    , directory
+    , sqlite-simple >= 0.4.19.0
+  hs-source-dirs: lib
+  exposed-modules: 
+    Project,
+    SetupDatabase
+
+executable tracker 
+  import:           settings
+  main-is:          Main.hs
+  build-depends:   
+    , base
+    , tracker
+  hs-source-dirs:   src
