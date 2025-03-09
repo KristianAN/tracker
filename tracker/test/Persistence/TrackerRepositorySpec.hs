@@ -4,7 +4,7 @@ module Persistence.TrackerRepositorySpec (spec) where
 
 import Control.Exception (bracket, evaluate)
 import Database.SQLite.Simple
-import Persistence.SetupDatabase (initializeSqlite)
+import Persistence.DatabaseUtils (initializeSqlite)
 import Persistence.TrackerRepository
 import Project (Project (..))
 import Test.Hspec
@@ -45,5 +45,9 @@ spec = do
                 deleteProject c "name" `shouldReturn` Success ()
 
             it "deleting a non-existant project succeeds" $ \c -> do
+                insertProject c exampleProject
+                deleteProject c "noname" `shouldReturn` Success ()
+
+            it "updating project " $ \c -> do
                 insertProject c exampleProject
                 deleteProject c "noname" `shouldReturn` Success ()

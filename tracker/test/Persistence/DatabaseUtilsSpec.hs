@@ -1,10 +1,10 @@
 {-# LANGUAGE OverloadedStrings #-}
 
-module Persistence.SetupDatabaseSpec (spec) where
+module Persistence.DatabaseUtilsSpec (spec) where
 
 import Control.Exception (bracket, evaluate)
 import Database.SQLite.Simple
-import Persistence.SetupDatabase (initializeSqlite)
+import Persistence.DatabaseUtils (initializeSqlite)
 import Test.Hspec
 
 openWithTables :: IO Connection
@@ -23,7 +23,7 @@ getTable conn tableName =
 spec :: Spec
 spec = do
     around withDatabase $ do
-        describe "Persistence.SetupDatabase Operations" $ do
+        describe "Persistence.DatabaseUtils Operations" $ do
             it "project table is created" $ \c -> do
                 getTable c "project" `shouldReturn` [Only 1]
 

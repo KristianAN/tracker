@@ -23,7 +23,7 @@ library
   exposed-modules: 
     Project,
     Persistence.TrackerRepository,
-    Persistence.SetupDatabase,
+    Persistence.DatabaseUtils,
 
 executable tracker 
   import:           settings
@@ -42,7 +42,7 @@ test-suite tracker-tests
   build-tool-depends: hspec-discover:hspec-discover == 2.*
   other-modules:
     Persistence.TrackerRepositorySpec
-    Persistence.SetupDatabaseSpec
+    Persistence.DatabaseUtilsSpec
   build-depends:
     , base
     , sqlite-simple
