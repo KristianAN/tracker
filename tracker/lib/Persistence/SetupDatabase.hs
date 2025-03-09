@@ -1,6 +1,6 @@
 {-# LANGUAGE OverloadedStrings #-}
 
-module Persistence.SetupDatabase (initDatabase, initializeSqlite) where
+module Persistence.SetupDatabase (initDatabase, initializeSqlite, withConnection) where
 
 import Control.Exception (bracket)
 import Control.Monad (unless)
@@ -15,6 +15,11 @@ databasePath = do
     let dbDir = home </> ".local" </> "state" </> "tracker"
     createDirectoryIfMissing True dbDir
     pure $ dbDir </> "tracker_db.db"
+
+withConnection :: (Connection -> IO a) -> IO a
+withConnection dbOp = do
+    path <- databasePath
+    bracket (open path) close dbOp
 
 initializeSqlite :: Connection -> IO ()
 initializeSqlite conn = do
