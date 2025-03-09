@@ -1,10 +1,9 @@
 module Main where
 
-import CLI (runCli)
+import Interpreter
 import Persistence.DatabaseUtils (initDatabase)
 
 main :: IO ()
 main = do
     initDatabase
-    options <- runCli
-    print options
+    interpret

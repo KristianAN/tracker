@@ -1,6 +1,6 @@
 {-# LANGUAGE OverloadedStrings #-}
 
-module CLI (runCli) where
+module CLI (runCli, CLI (..)) where
 
 import Data.Text qualified as T
 import Options.Applicative

@@ -25,6 +25,7 @@ library
     Project,
     Persistence.TrackerRepository,
     Persistence.DatabaseUtils,
+    Interpreter,
     CLI
 
 executable tracker 

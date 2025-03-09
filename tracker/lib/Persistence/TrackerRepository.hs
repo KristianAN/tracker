@@ -63,4 +63,6 @@ deleteProject conn name = do
         Left exception -> pure $ Error $ T.pack $ show exception
         Right _ -> pure $ Success ()
 
+updateProject :: Connection -> 
+
 -- Repository actions for TimeEntry
