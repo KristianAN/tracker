@@ -20,7 +20,7 @@ initializeSqlite :: Connection -> IO ()
 initializeSqlite conn = do
     execute_ conn "PRAGMA foreign_keys = ON;"
     execute_ conn "create table if not exists project (name text primary key, external_id text)"
-    execute_ conn "create table if not exists time_entry (project_name text not null, start_time text not null, end_time text)"
+    execute_ conn "create table if not exists time_entry (project_name text not null, start_time text not null, end_time text, foreign key (project_name) references project(name))"
 
 initializeSqliteDbWithPath :: FilePath -> IO ()
 initializeSqliteDbWithPath dbPath = do

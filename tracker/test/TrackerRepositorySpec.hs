@@ -7,7 +7,7 @@ import Database.SQLite.Simple
 import Project (Project (..))
 import SetupDatabase (initializeSqlite)
 import Test.Hspec
-import TrackerRepository (RepositoryActionResult (..), insertProject, selectProject)
+import TrackerRepository
 
 openWithTables :: IO Connection
 openWithTables = do
@@ -39,3 +39,11 @@ spec = do
             it "reading a project with wrong id gives Nothing" $ \c -> do
                 insertProject c exampleProject
                 selectProject c "noname" `shouldReturn` Success Nothing
+
+            it "deleting project succeeds" $ \c -> do
+                insertProject c exampleProject
+                deleteProject c "name" `shouldReturn` Success ()
+
+            it "deleting a non-existant project succeeds" $ \c -> do
+                insertProject c exampleProject
+                deleteProject c "noname" `shouldReturn` Success ()

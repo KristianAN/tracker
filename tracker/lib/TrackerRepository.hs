@@ -1,6 +1,6 @@
 {-# LANGUAGE OverloadedStrings #-}
 
-module TrackerRepository (insertProject, RepositoryActionResult (..), selectProject) where
+module TrackerRepository (deleteProject, insertProject, RepositoryActionResult (..), selectProject) where
 
 import Control.Exception
 import Data.Functor
@@ -12,6 +12,8 @@ data RepositoryActionResult a
     = Success {value :: a}
     | Error {reason :: T.Text}
     deriving (Show, Eq)
+
+-- Repository actions for Project
 
 insertProject :: Connection -> Project -> IO (RepositoryActionResult ())
 insertProject conn project = do
@@ -47,5 +49,18 @@ selectProject conn name = do
                         Just Project{name = pName, externalId = extId}
             [] -> pure $ Success Nothing
 
-deleteProject :: Connection -> Project -> IO (RepositoryActionResult ())
-deleteProject conn project = undefined
+deleteProject :: Connection -> T.Text -> IO (RepositoryActionResult ())
+deleteProject conn name = do
+    result <-
+        try
+            ( execute
+                conn
+                "delete from project where name = ?"
+                (Only name)
+            ) ::
+            IO (Either SomeException ())
+    case result of
+        Left exception -> pure $ Error $ T.pack $ show exception
+        Right _ -> pure $ Success ()
+
+-- Repository actions for TimeEntry
