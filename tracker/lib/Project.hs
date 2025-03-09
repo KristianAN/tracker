@@ -18,3 +18,4 @@ data TimeEntry = TimeEntry
     , startTime :: LocalTime
     , endtime :: Maybe LocalTime
     }
+    deriving (Show, Eq)

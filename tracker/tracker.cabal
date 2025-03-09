@@ -42,6 +42,7 @@ test-suite tracker-tests
   build-tool-depends: hspec-discover:hspec-discover == 2.*
   other-modules:
     TrackerRepositorySpec
+    SetupDatabaseSpec
   build-depends:
     , base
     , sqlite-simple
