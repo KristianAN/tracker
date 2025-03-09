@@ -21,7 +21,7 @@ interpret = do
                              in putStrLn $ T.unpack projectStr
                         | otherwise ->
                             putStrLn
-                                "You have not added any projects yet, consider adding a project with tracker add"
+                                "Nothing to list, consider adding a project with tracker add"
                     Error reason -> putStrLn $ T.unpack reason
         Start project ->
             case project of

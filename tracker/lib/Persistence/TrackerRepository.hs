@@ -6,11 +6,14 @@ module Persistence.TrackerRepository (
     RepositoryActionResult (..),
     selectProject,
     selectAllProjects,
+    insertNewEntry,
 ) where
 
 import Control.Exception
 import Data.Functor
 import Data.Text qualified as T
+import Data.Time (LocalTime, getCurrentTime, getCurrentTimeZone, utcToLocalTime)
+import Data.Time.Format
 import Database.SQLite.Simple
 import Project (Project (..))
 
@@ -100,3 +103,28 @@ deleteProject conn name = do
         Right _ -> pure $ Success ()
 
 -- Repository actions for TimeEntry
+
+timeToString :: LocalTime -> String
+timeToString = formatTime defaultTimeLocale "%Y-%m-%d %H:%M:%S"
+
+timeFromString :: String -> LocalTime
+timeFromString timeString = parseTimeOrError True defaultTimeLocale "%Y-%m-%d %H:%M:%S" timeString
+
+insertNewEntry ::
+    Connection ->
+    T.Text -> -- project name
+    IO (RepositoryActionResult ())
+insertNewEntry conn name = do
+    currentTime <- getCurrentTime
+    timeZone <- getCurrentTimeZone
+    result <-
+        try
+            ( execute
+                conn
+                "insert into time_entry (project_name, start_time) values (?, ?)"
+                (name, timeToString (utcToLocalTime timeZone currentTime))
+            ) ::
+            IO (Either SomeException ())
+    case result of
+        Left exception -> pure $ Error $ T.pack $ show exception
+        Right _ -> pure $ Success ()

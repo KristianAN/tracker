@@ -1,6 +1,6 @@
 {-# LANGUAGE OverloadedStrings #-}
 
-module Project (Project (..), prettyPrintProject) where
+module Project (Project (..), TimeEntry (..), prettyPrintProject) where
 
 import Data.Maybe
 import Data.Text qualified as T

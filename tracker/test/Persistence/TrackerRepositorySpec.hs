@@ -53,3 +53,8 @@ spec = do
                 let secondProject = exampleProject{name = "name_two"}
                 insertProject c secondProject
                 selectAllProjects c `shouldReturn` Success ([exampleProject, secondProject])
+
+            it "can insert a new time entry" $ \c -> do
+                insertProject c exampleProject
+
+                insertNewEntry c "name" `shouldReturn` Success ()
