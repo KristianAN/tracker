@@ -1,7 +1,7 @@
 {
   description = "tracker";
   inputs = {
-    nixpkgs.url = "github:nixos/nixpkgs/nixpkgs-unstable";
+    nixpkgs.url = "github:nixos/nixpkgs/nixos-24.11";
     flake-parts.url = "github:hercules-ci/flake-parts";
     haskell-flake.url = "github:srid/haskell-flake";
   };
@@ -26,7 +26,7 @@
             # The base package set representing a specific GHC version.
             # By default, this is pkgs.haskellPackages.
             # You may also create your own. See https://community.flake.parts/haskell-flake/package-set
-            # basePackages = pkgs.haskellPackages;
+            # basePackages = pkgs.haskell.packages.ghc964;
 
             # Extra package information. See https://community.flake.parts/haskell-flake/dependency
             #
@@ -45,6 +45,7 @@
               #    haddock = false;
               #    broken = false;
               #  };
+              allowBroken = true;
             };
 
             devShell = {

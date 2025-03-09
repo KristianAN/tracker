@@ -18,16 +18,33 @@ library
     , time
     , filepath
     , directory
-    , sqlite-simple >= 0.4.19.0
+    , sqlite-simple 
   hs-source-dirs: lib
   exposed-modules: 
+    TrackerRepository,
     Project,
-    SetupDatabase
+    SetupDatabase,
 
 executable tracker 
   import:           settings
   main-is:          Main.hs
+  default-language: GHC2021
   build-depends:   
     , base
     , tracker
   hs-source-dirs:   src
+
+test-suite tracker-tests
+  type: exitcode-stdio-1.0
+  hs-source-dirs: test
+  default-language: GHC2021
+  main-is: Spec.hs
+  build-tool-depends: hspec-discover:hspec-discover == 2.*
+  other-modules:
+    TrackerRepositorySpec
+  build-depends:
+    , base
+    , sqlite-simple
+    , hspec 
+    , hspec-contrib 
+    , tracker
