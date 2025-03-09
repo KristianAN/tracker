@@ -1,6 +1,12 @@
 {-# LANGUAGE OverloadedStrings #-}
 
-module Persistence.TrackerRepository (deleteProject, insertProject, RepositoryActionResult (..), selectProject) where
+module Persistence.TrackerRepository (
+    deleteProject,
+    insertProject,
+    RepositoryActionResult (..),
+    selectProject,
+    selectAllProjects,
+) where
 
 import Control.Exception
 import Data.Functor
@@ -15,7 +21,10 @@ data RepositoryActionResult a
 
 -- Repository actions for Project
 
-insertProject :: Connection -> Project -> IO (RepositoryActionResult ())
+insertProject ::
+    Connection -> -- sqlite database connection
+    Project -> -- The project to insert
+    IO (RepositoryActionResult ())
 insertProject conn project = do
     result <-
         try
@@ -29,13 +38,19 @@ insertProject conn project = do
         Left exception -> pure $ Error $ T.pack $ show exception
         Right _ -> pure $ Success ()
 
-selectProject :: Connection -> T.Text -> IO (RepositoryActionResult (Maybe Project))
+selectProjectFr :: Query
+selectProjectFr = "select name, external_id from project"
+
+selectProject ::
+    Connection -> -- Sqlite database connection
+    T.Text -> -- name of the project to select
+    IO (RepositoryActionResult (Maybe Project))
 selectProject conn name = do
     result <-
         try
             ( query
                 conn
-                "select name, external_id from project where name = ?"
+                (selectProjectFr <> " where name = ?")
                 (Only name) ::
                 IO [(T.Text, Maybe T.Text)]
             ) ::
@@ -49,7 +64,28 @@ selectProject conn name = do
                         Just Project{name = pName, externalId = extId}
             [] -> pure $ Success Nothing
 
-deleteProject :: Connection -> T.Text -> IO (RepositoryActionResult ())
+selectAllProjects :: Connection -> IO (RepositoryActionResult [Project])
+selectAllProjects conn = do
+    result <-
+        try
+            ( query_ conn selectProjectFr :: IO [(T.Text, Maybe T.Text)]
+            ) ::
+            IO (Either SomeException [(T.Text, Maybe T.Text)])
+    case result of
+        Left exception -> pure $ Error $ T.pack $ show exception
+        Right rows ->
+            let projects =
+                    fmap
+                        ( \(pName, extId) ->
+                            Project{name = pName, externalId = extId}
+                        )
+                        rows
+             in pure $ Success projects
+
+deleteProject ::
+    Connection -> -- sqlite database connection
+    T.Text -> -- name of project to delete
+    IO (RepositoryActionResult ())
 deleteProject conn name = do
     result <-
         try
@@ -62,7 +98,5 @@ deleteProject conn name = do
     case result of
         Left exception -> pure $ Error $ T.pack $ show exception
         Right _ -> pure $ Success ()
-
-updateProject :: Connection -> 
 
 -- Repository actions for TimeEntry

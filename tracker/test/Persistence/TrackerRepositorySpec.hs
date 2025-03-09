@@ -48,6 +48,8 @@ spec = do
                 insertProject c exampleProject
                 deleteProject c "noname" `shouldReturn` Success ()
 
-            it "updating project " $ \c -> do
+            it "can list all projects" $ \c -> do
                 insertProject c exampleProject
-                deleteProject c "noname" `shouldReturn` Success ()
+                let secondProject = exampleProject{name = "name_two"}
+                insertProject c secondProject
+                selectAllProjects c `shouldReturn` Success ([exampleProject, secondProject])

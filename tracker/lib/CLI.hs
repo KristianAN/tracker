@@ -6,7 +6,7 @@ import Data.Text qualified as T
 import Options.Applicative
 import Project qualified as P
 
-data CLI = Start {project :: Maybe T.Text} | AddProject P.Project deriving (Show)
+data CLI = Start {project :: Maybe T.Text} | AddProject P.Project | List deriving (Show)
 
 startParser :: Parser CLI
 startParser =
@@ -29,11 +29,15 @@ addProjectParser =
                     )
             )
 
+listParser :: Parser CLI
+listParser = pure List
+
 cli :: Parser CLI
 cli =
     hsubparser
         ( command "start" (info startParser (progDesc "Start time tracking"))
             <> command "add" (info addProjectParser (progDesc "Add a project for tracking"))
+            <> command "list" (info listParser (progDesc "List all projects"))
         )
 
 cliInfo :: ParserInfo CLI

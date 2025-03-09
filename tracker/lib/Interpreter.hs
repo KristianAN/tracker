@@ -4,11 +4,21 @@ import CLI
 import Data.Text qualified as T
 import Persistence.DatabaseUtils (withTrackerConnection)
 import Persistence.TrackerRepository
+import Project (prettyPrintProject)
 
 interpret :: IO ()
 interpret = do
     opts <- runCli
     case opts of
+        List ->
+            withTrackerConnection $ \c -> do
+                result <- selectAllProjects c
+                case result of
+                    Success projects ->
+                        let prettyPrinted = fmap prettyPrintProject projects
+                            projectStr = T.intercalate (T.pack "\n") prettyPrinted
+                         in putStrLn $ T.unpack projectStr
+                    Error reason -> putStrLn $ T.unpack reason
         Start project ->
             case project of
                 Just project -> undefined
