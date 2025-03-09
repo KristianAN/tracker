@@ -14,10 +14,14 @@ interpret = do
             withTrackerConnection $ \c -> do
                 result <- selectAllProjects c
                 case result of
-                    Success projects ->
-                        let prettyPrinted = fmap prettyPrintProject projects
-                            projectStr = T.intercalate (T.pack "\n") prettyPrinted
-                         in putStrLn $ T.unpack projectStr
+                    Success projects
+                        | not (null projects) ->
+                            let prettyPrinted = fmap prettyPrintProject projects
+                                projectStr = T.intercalate (T.pack "\n") prettyPrinted
+                             in putStrLn $ T.unpack projectStr
+                        | otherwise ->
+                            putStrLn
+                                "You have not added any projects yet, consider adding a project with tracker add"
                     Error reason -> putStrLn $ T.unpack reason
         Start project ->
             case project of
