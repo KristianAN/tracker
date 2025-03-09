@@ -1,6 +1,6 @@
 {-# LANGUAGE OverloadedStrings #-}
 
-module SetupDatabase (initDatabase, initializeSqlite) where
+module Persistence.SetupDatabase (initDatabase, initializeSqlite) where
 
 import Control.Exception (bracket)
 import Control.Monad (unless)

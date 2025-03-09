@@ -1,6 +1,6 @@
 module Main where
 
-import SetupDatabase (initDatabase)
+import Persistence.SetupDatabase (initDatabase)
 
 main :: IO ()
 main = initDatabase

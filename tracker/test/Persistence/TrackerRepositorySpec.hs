@@ -1,13 +1,13 @@
 {-# LANGUAGE OverloadedStrings #-}
 
-module TrackerRepositorySpec (spec) where
+module Persistence.TrackerRepositorySpec (spec) where
 
 import Control.Exception (bracket, evaluate)
 import Database.SQLite.Simple
+import Persistence.SetupDatabase (initializeSqlite)
+import Persistence.TrackerRepository
 import Project (Project (..))
-import SetupDatabase (initializeSqlite)
 import Test.Hspec
-import TrackerRepository
 
 openWithTables :: IO Connection
 openWithTables = do

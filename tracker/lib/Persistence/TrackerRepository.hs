@@ -1,6 +1,6 @@
 {-# LANGUAGE OverloadedStrings #-}
 
-module TrackerRepository (deleteProject, insertProject, RepositoryActionResult (..), selectProject) where
+module Persistence.TrackerRepository (deleteProject, insertProject, RepositoryActionResult (..), selectProject) where
 
 import Control.Exception
 import Data.Functor

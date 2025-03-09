@@ -21,9 +21,9 @@ library
     , sqlite-simple 
   hs-source-dirs: lib
   exposed-modules: 
-    TrackerRepository,
     Project,
-    SetupDatabase,
+    Persistence.TrackerRepository,
+    Persistence.SetupDatabase,
 
 executable tracker 
   import:           settings
@@ -41,8 +41,8 @@ test-suite tracker-tests
   main-is: Spec.hs
   build-tool-depends: hspec-discover:hspec-discover == 2.*
   other-modules:
-    TrackerRepositorySpec
-    SetupDatabaseSpec
+    Persistence.TrackerRepositorySpec
+    Persistence.SetupDatabaseSpec
   build-depends:
     , base
     , sqlite-simple
