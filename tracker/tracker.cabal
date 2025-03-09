@@ -18,12 +18,14 @@ library
     , time
     , filepath
     , directory
-    , sqlite-simple 
+    , sqlite-simple
+    , optparse-applicative
   hs-source-dirs: lib
   exposed-modules: 
     Project,
     Persistence.TrackerRepository,
     Persistence.DatabaseUtils,
+    CLI
 
 executable tracker 
   import:           settings
