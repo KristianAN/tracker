@@ -58,3 +58,8 @@ spec = do
                 insertProject c exampleProject
 
                 insertNewEntry c "name" `shouldReturn` Success ()
+
+            it "when inserting a new time entry active_tracking should be project" $ \c -> do
+                insertProject c exampleProject
+
+                insertNewEntry c "name" `shouldReturn` Success ()

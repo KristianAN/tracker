@@ -27,5 +27,8 @@ spec = do
             it "project table is created" $ \c -> do
                 getTable c "project" `shouldReturn` [Only 1]
 
-            it "project time_entry is created" $ \c -> do
+            it "time_entry table is created" $ \c -> do
                 getTable c "time_entry" `shouldReturn` [Only 1]
+
+            it "active_tracking table is created" $ \c -> do
+                getTable c "active_tracking" `shouldReturn` [Only 1]

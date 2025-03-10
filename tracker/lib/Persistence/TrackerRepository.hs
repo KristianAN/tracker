@@ -7,6 +7,7 @@ module Persistence.TrackerRepository (
     selectProject,
     selectAllProjects,
     insertNewEntry,
+    selectActiveTracking,
 ) where
 
 import Control.Exception
@@ -101,6 +102,32 @@ deleteProject conn name = do
     case result of
         Left exception -> pure $ Error $ T.pack $ show exception
         Right _ -> pure $ Success ()
+
+-- Repository actions for active_tracking
+
+updateActiveTracking :: Connection -> T.Text -> IO (RepositoryActionResult ())
+updateActiveTracking conn name = do
+    result <-
+        try
+            ( execute conn "update table active_tracking set name = ? where id = 0" (Only name)
+            ) ::
+            IO (Either SomeException ())
+    case result of
+        Left err -> pure $ Error $ T.pack $ show err
+        Right _ -> pure $ Success ()
+
+selectActiveTracking :: Connection -> IO (RepositoryActionResult (Maybe Project))
+selectActiveTracking conn = do
+    result <-
+        try
+            ( query_ conn "select name from active_tracking where id = 0" :: IO [T.Text]
+            ) ::
+            IO (Either SomeException [T.Text])
+    case result of
+        Right value -> case value of
+            [active] -> selectProject conn active
+            _ -> pure $ Success Nothing
+        Left err -> pure $ Error $ T.pack $ show err
 
 -- Repository actions for TimeEntry
 
