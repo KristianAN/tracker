@@ -25,6 +25,7 @@ library
     Project,
     Persistence.TrackerRepository,
     Persistence.DatabaseUtils,
+    Logic.TimeEntryLogic,
     Interpreter,
     CLI
 
@@ -48,6 +49,7 @@ test-suite tracker-tests
     Persistence.DatabaseUtilsSpec
   build-depends:
     , base
+    , text
     , sqlite-simple
     , hspec 
     , hspec-contrib 

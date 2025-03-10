@@ -21,11 +21,41 @@ withTrackerConnection dbOp = do
     path <- databasePath
     bracket (open path) close dbOp
 
+projectTableQuery :: Query
+projectTableQuery =
+    "create table if not exists project"
+        <> "(name text primary key,"
+        <> "external_id text)"
+
+timeEntryTableQuery :: Query
+timeEntryTableQuery =
+    "create table if not exists time_entry"
+        <> "(project_name text not null,"
+        <> "start_time text not null,"
+        <> "end_time text,"
+        <> "foreign key (project_name) references project(name))"
+
+activeTrackingQuery :: Query
+activeTrackingQuery =
+    "create table if not exists active_tracking"
+        <> "(id integer primary key check (id = 0),"
+        <> "current_active text)"
+
+activeTrackingDefault :: Query
+activeTrackingDefault =
+    "insert into active_tracking (id, current_active) values(0, null)"
+
+pragmas :: Connection -> IO ()
+pragmas conn =
+    execute_ conn "PRAGMA foreign_keys = ON;"
+
 initializeSqlite :: Connection -> IO ()
 initializeSqlite conn = do
-    execute_ conn "PRAGMA foreign_keys = ON;"
-    execute_ conn "create table if not exists project (name text primary key, external_id text)"
-    execute_ conn "create table if not exists time_entry (project_name text not null, start_time text not null, end_time text, foreign key (project_name) references project(name))"
+    pragmas conn
+    execute_ conn projectTableQuery
+    execute_ conn timeEntryTableQuery
+    execute_ conn activeTrackingQuery
+    execute_ conn activeTrackingDefault
 
 initializeSqliteDbWithPath :: FilePath -> IO ()
 initializeSqliteDbWithPath dbPath = do
