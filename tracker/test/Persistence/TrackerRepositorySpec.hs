@@ -5,9 +5,9 @@ module Persistence.TrackerRepositorySpec (spec) where
 import Control.Exception (bracket, evaluate)
 import Data.Text qualified as T
 import Database.SQLite.Simple
+import Models.Project (Project (..))
 import Persistence.DatabaseUtils (initializeSqlite)
 import Persistence.TrackerRepository
-import Project (Project (..))
 import Test.Hspec
 
 openWithTables :: IO Connection
@@ -101,7 +101,7 @@ spec = do
             it "unset active tracking makes it impossible to select active" $ \c -> do
                 insertProject c exampleProject
                 updateActiveTracking c "name"
-                unsetActiveTracking c "name"
+                unsetActiveTracking c
                 selectActiveTracking c `shouldReturn` Error "No current_active set in table active_tracking"
 
             it "updating active tracking to non-existent project still succeeds at database level" $ \c -> do

@@ -3,8 +3,8 @@
 module CLI (runCli, CLI (..)) where
 
 import Data.Text qualified as T
+import Models.Project qualified as P
 import Options.Applicative
-import Project qualified as P
 
 data CLI = Start {project :: Maybe T.Text} | AddProject P.Project | List deriving (Show)
 

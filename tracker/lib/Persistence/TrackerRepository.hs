@@ -18,7 +18,7 @@ import Data.Text qualified as T
 import Data.Time (LocalTime, getCurrentTime, getCurrentTimeZone, utcToLocalTime)
 import Data.Time.Format
 import Database.SQLite.Simple
-import Project (Project (..))
+import Models.Project (Project (..))
 
 data RepositoryActionResult a
     = Success {value :: a}
@@ -118,8 +118,8 @@ updateActiveTracking conn name = do
         Left err -> pure $ Error $ T.pack $ show err
         Right _ -> pure $ Success ()
 
-unsetActiveTracking :: Connection -> T.Text -> IO (RepositoryActionResult ())
-unsetActiveTracking conn name = do
+unsetActiveTracking :: Connection -> IO (RepositoryActionResult ())
+unsetActiveTracking conn = do
     result <-
         try
             ( execute_ conn "update active_tracking set current_active = null where id = 0"
@@ -153,7 +153,7 @@ timeToString :: LocalTime -> String
 timeToString = formatTime defaultTimeLocale "%Y-%m-%d %H:%M:%S"
 
 timeFromString :: String -> LocalTime
-timeFromString timeString = parseTimeOrError True defaultTimeLocale "%Y-%m-%d %H:%M:%S" timeString
+timeFromString = parseTimeOrError True defaultTimeLocale "%Y-%m-%d %H:%M:%S"
 
 insertNewEntry ::
     Connection ->

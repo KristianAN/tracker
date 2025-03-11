@@ -4,9 +4,9 @@ import CLI
 import Data.Functor
 import Data.Text qualified as T
 import Database.SQLite.Simple
+import Models.Project
 import Persistence.DatabaseUtils (withTrackerConnection)
 import Persistence.TrackerRepository
-import Project
 import System.Directory (getCurrentDirectory)
 import System.FilePath (takeFileName)
 

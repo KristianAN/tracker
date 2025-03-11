@@ -22,7 +22,8 @@ library
     , optparse-applicative
   hs-source-dirs: lib
   exposed-modules: 
-    Project,
+    Models.Project,
+    Models.TimeEntry,
     Persistence.TrackerRepository,
     Persistence.DatabaseUtils,
     Logic.TimeEntryLogic,
