@@ -10,5 +10,6 @@ data TimeEntry = TimeEntry
     { projectName :: T.Text
     , startTime :: LocalTime
     , endtime :: Maybe LocalTime
+    , rowId :: Maybe Int
     }
     deriving (Show, Eq)

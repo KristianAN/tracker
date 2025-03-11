@@ -8,17 +8,21 @@ module Persistence.TrackerRepository (
     selectAllProjects,
     insertNewEntry,
     selectActiveTracking,
-    updateActiveTracking,
     unsetActiveTracking,
+    updateActiveTracking,
+    finalizeTimeEntry,
+    selectTimeEntries,
 ) where
 
 import Control.Exception
 import Data.Functor
 import Data.Text qualified as T
-import Data.Time (LocalTime, getCurrentTime, getCurrentTimeZone, utcToLocalTime)
+import Data.Time (LocalTime (..), getCurrentTime, getCurrentTimeZone, utcToLocalTime)
 import Data.Time.Format
 import Database.SQLite.Simple
+import Database.SQLite.Simple.ToField (ToField (toField))
 import Models.Project (Project (..))
+import Models.TimeEntry
 
 data RepositoryActionResult a
     = Success {value :: a}
@@ -149,11 +153,22 @@ selectActiveTracking conn = do
 
 -- Repository actions for TimeEntry
 
-timeToString :: LocalTime -> String
-timeToString = formatTime defaultTimeLocale "%Y-%m-%d %H:%M:%S"
+newtype StoredLocalTime = StoredLocalTime LocalTime
 
-timeFromString :: String -> LocalTime
-timeFromString = parseTimeOrError True defaultTimeLocale "%Y-%m-%d %H:%M:%S"
+timeToString :: StoredLocalTime -> String
+timeToString (StoredLocalTime lt) = formatTime defaultTimeLocale "%Y-%m-%d %H:%M:%S" lt
+
+instance ToField StoredLocalTime where
+    toField = toField . timeToString
+
+timeFromString :: T.Text -> StoredLocalTime
+timeFromString str = StoredLocalTime $ parseTimeOrError True defaultTimeLocale "%Y-%m-%d %H:%M:%S" $ T.unpack str
+
+storedToLocalTime :: StoredLocalTime -> LocalTime
+storedToLocalTime (StoredLocalTime localTime) = localTime
+
+storedStringToLocalTime :: T.Text -> LocalTime
+storedStringToLocalTime time = storedToLocalTime $ timeFromString time
 
 insertNewEntry ::
     Connection ->
@@ -167,7 +182,40 @@ insertNewEntry conn name = do
             ( execute
                 conn
                 "insert into time_entry (project_name, start_time) values (?, ?)"
-                (name, timeToString (utcToLocalTime timeZone currentTime))
+                (name, StoredLocalTime (utcToLocalTime timeZone currentTime))
+            ) ::
+            IO (Either SomeException ())
+    case result of
+        Left exception -> pure $ Error $ T.pack $ show exception
+        Right _ -> pure $ Success ()
+
+selectTimeEntries :: Connection -> T.Text -> IO (RepositoryActionResult [TimeEntry])
+selectTimeEntries conn name = do
+    result <-
+        try
+            ( query
+                conn
+                "select rowid, project_name ,start_time, end_time from time_entry where project_name = ?"
+                (Only name)
+            ) ::
+            IO (Either SomeException [(Int, T.Text, T.Text, Maybe T.Text)])
+    case result of
+        Left err -> pure $ Error $ T.pack $ show err
+        Right res ->
+            let entries = fmap (\(eId, eName, start, end) -> TimeEntry{projectName = eName, startTime = storedStringToLocalTime start, endtime = end <&> storedStringToLocalTime, rowId = Just eId}) res
+             in pure $ Success entries
+
+-- TODO : Test
+finalizeTimeEntry :: Connection -> T.Text -> IO (RepositoryActionResult ())
+finalizeTimeEntry conn name = do
+    currentTime <- getCurrentTime
+    timeZone <- getCurrentTimeZone
+    result <-
+        try
+            ( execute
+                conn
+                "update time_entry set end_time = ? where project_name = ? and end_time is null"
+                (StoredLocalTime (utcToLocalTime timeZone currentTime), name)
             ) ::
             IO (Either SomeException ())
     case result of

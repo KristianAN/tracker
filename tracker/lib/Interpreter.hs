@@ -4,6 +4,7 @@ import CLI
 import Data.Functor
 import Data.Text qualified as T
 import Database.SQLite.Simple
+import Logic.TimeEntryLogic (newTimeEntry)
 import Models.Project
 import Persistence.DatabaseUtils (withTrackerConnection)
 import Persistence.TrackerRepository
@@ -25,22 +26,13 @@ listAllProjects c = do
         Error reason -> putStrLn $ T.unpack reason
 
 startTracking :: Maybe T.Text -> IO ()
-startTracking project =
-    case project of
-        Just projectName ->
-            withTrackerConnection $ \c -> do
-                result <- insertNewEntry c projectName
-                case result of
-                    Success () -> putStrLn $ "Using provided project name. Started tracking time for project: " <> T.unpack projectName
-                    Error reason -> putStrLn $ T.unpack reason
-        Nothing -> do
-            currentDir <- getCurrentDirectory <&> takeFileName
-            withTrackerConnection $ \c -> do
-                result <- insertNewEntry c $ T.pack currentDir
-                case result of
-                    Success () -> putStrLn $ "Started tracking time for project: " <> currentDir
-                    Error reason -> putStrLn $ T.unpack reason
-
+startTracking project = do
+    path <- case project of
+        Nothing ->
+            getCurrentDirectory <&> takeFileName
+        Just projectName -> pure $ T.unpack projectName
+    withTrackerConnection $ \c -> do
+        newTimeEntry c $ T.pack path
 addProject :: Project -> IO ()
 addProject project =
     withTrackerConnection $ \c -> do

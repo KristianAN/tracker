@@ -6,15 +6,7 @@ import Control.Exception (bracket, evaluate)
 import Database.SQLite.Simple
 import Persistence.DatabaseUtils (initializeSqlite)
 import Test.Hspec
-
-openWithTables :: IO Connection
-openWithTables = do
-    conn <- open ":memory:"
-    initializeSqlite conn
-    pure conn
-
-withDatabase :: (Connection -> IO ()) -> IO ()
-withDatabase = bracket openWithTables close
+import TestUtils
 
 getTable :: Connection -> String -> IO [Only Int]
 getTable conn tableName =

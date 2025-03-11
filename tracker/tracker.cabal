@@ -46,8 +46,10 @@ test-suite tracker-tests
   main-is: Spec.hs
   build-tool-depends: hspec-discover:hspec-discover == 2.*
   other-modules:
-    Persistence.TrackerRepositorySpec
-    Persistence.DatabaseUtilsSpec
+      Persistence.TrackerRepositorySpec
+    , Persistence.DatabaseUtilsSpec
+    , Logic.TimeEntryLogicSpec
+    , TestUtils
   build-depends:
     , base
     , text

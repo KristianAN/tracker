@@ -2,22 +2,13 @@
 
 module Persistence.TrackerRepositorySpec (spec) where
 
-import Control.Exception (bracket, evaluate)
 import Data.Text qualified as T
 import Database.SQLite.Simple
 import Models.Project (Project (..))
 import Persistence.DatabaseUtils (initializeSqlite)
 import Persistence.TrackerRepository
 import Test.Hspec
-
-openWithTables :: IO Connection
-openWithTables = do
-    conn <- open ":memory:"
-    initializeSqlite conn
-    pure conn
-
-withDatabase :: (Connection -> IO ()) -> IO ()
-withDatabase = bracket openWithTables close
+import TestUtils
 
 exampleProject = Project{name = "name", externalId = Just "id"}
 
@@ -54,7 +45,7 @@ spec = do
                 insertProject c exampleProject
                 let secondProject = exampleProject{name = "name_two"}
                 insertProject c secondProject
-                selectAllProjects c `shouldReturn` Success ([exampleProject, secondProject])
+                selectAllProjects c `shouldReturn` Success [exampleProject, secondProject]
 
             it "inserting a project with duplicate name fails" $ \c -> do
                 insertProject c exampleProject
