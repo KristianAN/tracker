@@ -55,6 +55,18 @@ spec = do
                     Success res -> isJust (endtime (head res)) `shouldBe` False
                     Error err -> expectationFailure $ T.unpack err
 
+            it "Starting many entries should have just one that is tracking" $ \c -> do
+                insertProject c exampleProject
+                newTimeEntry c "name"
+                newTimeEntry c "name"
+                newTimeEntry c "name"
+                newTimeEntry c "name"
+                selectTimeEntries c "name" >>= \case
+                    Success res -> do
+                        length (filter (isNothing . endtime) res) `shouldBe` 1
+                        length (filter (isJust . endtime) res) `shouldBe` 3
+                    Error err -> expectationFailure $ T.unpack err
+
             it "Creating time entry for non-existent project returns appropriate error" $ \c -> do
                 newTimeEntry c "nonexistent"
                 selectActiveTracking c `shouldReturn` Success Nothing

@@ -14,21 +14,25 @@ import Persistence.TrackerRepository
 newTimeEntry ::
     Connection -> -- sqlite connection
     T.Text -> -- name of the project to create an entry for
-    IO () -- Some IO
+    IO (Maybe T.Text, T.Text) -- Some IO
 newTimeEntry conn name = do
-    selectActiveTracking conn >>= \case
-        Error err -> putStrLn $ T.unpack err
-        Success maybeRunning ->
-            case maybeRunning of
-                Just running ->
-                    let runningName = P.name running
-                     in finalizeTimeEntry conn runningName >>= \case
-                            Error err -> putStrLn $ T.unpack err
-                            Success () -> putStrLn $ "Finalized time entry for " <> T.unpack runningName <> "."
-                Nothing -> pure ()
-    updateActiveTracking conn name >>= \case
-        Error err -> putStrLn $ T.unpack err
-        Success () ->
-            insertNewEntry conn name >>= \case
-                Error err -> putStrLn $ T.unpack err
-                Success () -> putStrLn $ "Using provided project name. Started tracking time for project: " <> T.unpack name
+    selectOut <-
+        selectActiveTracking conn >>= \case
+            Error err -> pure $ Just err
+            Success maybeRunning ->
+                case maybeRunning of
+                    Just running ->
+                        let runningName = P.name running
+                         in finalizeTimeEntry conn runningName >>= \case
+                                Error err -> pure $ Just err
+                                Success () -> pure $ Just $ "Finalized time entry for " <> runningName <> "."
+                    Nothing -> pure Nothing
+    updateOut <-
+        updateActiveTracking conn name >>= \case
+            Error err -> pure err
+            Success () ->
+                insertNewEntry conn name >>= \case
+                    Error err -> pure err
+                    Success () -> pure $ "Using provided project name. Started tracking time for project: " <> name
+
+    pure (selectOut, updateOut)

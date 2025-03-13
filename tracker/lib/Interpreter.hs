@@ -32,7 +32,12 @@ startTracking project = do
             getCurrentDirectory <&> takeFileName
         Just projectName -> pure $ T.unpack projectName
     withTrackerConnection $ \c -> do
-        newTimeEntry c $ T.pack path
+        (selectOut, updateOut) <- newTimeEntry c $ T.pack path
+        case selectOut of
+            Just o -> putStrLn $ T.unpack o
+            Nothing -> pure ()
+        putStrLn $ T.unpack updateOut
+
 addProject :: Project -> IO ()
 addProject project =
     withTrackerConnection $ \c -> do
