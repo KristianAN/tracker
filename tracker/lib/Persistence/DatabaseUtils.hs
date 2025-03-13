@@ -67,4 +67,4 @@ initDatabase = do
     exists <- doesPathExist path
     unless exists $ do
         putStrLn $ "This is your first time using tracker. Welcome!\nInfo: Initializing new database at " <> path
-    initializeSqliteDbWithPath path
+        initializeSqliteDbWithPath path
