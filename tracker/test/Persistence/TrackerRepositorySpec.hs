@@ -93,7 +93,7 @@ spec = do
                 insertProject c exampleProject
                 updateActiveTracking c "name"
                 unsetActiveTracking c
-                selectActiveTracking c `shouldReturn` Error "No current_active set in table active_tracking"
+                selectActiveTracking c `shouldReturn` Success Nothing
 
             it "updating active tracking to non-existent project still succeeds at database level" $ \c -> do
                 updateActiveTracking c "non-existent-project" `shouldReturn` Success ()

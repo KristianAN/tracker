@@ -1,10 +1,13 @@
+{-# LANGUAGE OverloadedStrings #-}
+
 module Interpreter (interpret) where
 
 import CLI
 import Data.Functor
+import Data.Maybe (fromMaybe)
 import Data.Text qualified as T
 import Database.SQLite.Simple
-import Logic.TimeEntryLogic (newTimeEntry)
+import Logic.TimeEntryLogic (newTimeEntry, stopTimeEntry)
 import Models.Project
 import Persistence.DatabaseUtils (withTrackerConnection)
 import Persistence.TrackerRepository
@@ -38,6 +41,11 @@ startTracking project = do
             Nothing -> pure ()
         putStrLn $ T.unpack updateOut
 
+stopTracking :: IO ()
+stopTracking = withTrackerConnection $ \c -> do
+    textOut <- stopTimeEntry c False <&> fromMaybe ""
+    putStrLn $ T.unpack textOut
+
 addProject :: Project -> IO ()
 addProject project =
     withTrackerConnection $ \c -> do
@@ -53,3 +61,4 @@ interpret = do
         List -> withTrackerConnection listAllProjects
         Start project -> startTracking project
         AddProject project -> addProject project
+        Stop -> stopTracking

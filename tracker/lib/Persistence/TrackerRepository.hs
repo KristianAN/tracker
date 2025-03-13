@@ -146,8 +146,7 @@ selectActiveTracking conn = do
                 case fromOnly maybeActive of
                     Just active -> selectProject conn active
                     Nothing ->
-                        pure $
-                            Error "No current_active set in table active_tracking"
+                        pure $ Success Nothing
             _ -> pure $ Success Nothing
         Left err -> pure $ Error $ T.pack $ show err
 
@@ -210,6 +209,7 @@ finalizeTimeEntry :: Connection -> T.Text -> IO (RepositoryActionResult ())
 finalizeTimeEntry conn name = do
     currentTime <- getCurrentTime
     timeZone <- getCurrentTimeZone
+    _ <- unsetActiveTracking conn -- TODO: Handle potential error case here
     result <-
         try
             ( execute
